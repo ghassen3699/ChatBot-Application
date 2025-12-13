@@ -11,6 +11,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@huggingface/inference": "^4.13.5",
     "express": "^5.2.1"
   },
   "scripts": {
