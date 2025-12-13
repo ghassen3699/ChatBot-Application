@@ -6,7 +6,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-res.send(`Hello, World! ${process.env.MODEL_API_KEY}`);
+  res.send(`Hello, World! ${process.env.MODEL_API_KEY}`);
+});
+
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello from the API!' });
 });
 
 app.listen(PORT, () => {
