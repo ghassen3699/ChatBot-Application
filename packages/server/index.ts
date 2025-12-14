@@ -1,9 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { HfInference } from "@huggingface/inference";
+import { InferenceClient } from "@huggingface/inference";
 
 dotenv.config();
-const hf = new HfInference(process.env.CHATBOT_HUGGINGFACE_READ_TOKEN);
+const client = new InferenceClient(process.env.CHATBOT_HUGGINGFACE_READ_TOKEN);
+
 
 const app = express();
 app.use(express.json());
@@ -18,16 +19,22 @@ app.get('/api/hello', (req, res) => {
 });
 
 app.post("/api/chat", async (req, res) => {
-  const { message } = req.body;
+  const { prompt } = req.body;
 
-  const prompt = `User: TEST\nBot:`;
-
-  const result = await hf.textGeneration({
-    model: "HuggingFaceH4/zephyr-7b-beta",
-    inputs: prompt
+  const chatCompletion = await client.chatCompletion({
+    model: "openai/gpt-oss-120b:fastest",
+    messages: [
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    max_tokens: 100,
+    temperature: 0.7,
+    conversion_id: "unique-conversation-id",
   });
-
-  res.json({ message: result.generated_text });
+  const responseMessage = chatCompletion.choices[0]?.message?.content || "No response";
+  res.json({ message: responseMessage });
 });
 
 app.listen(PORT, () => {
