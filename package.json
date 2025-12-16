@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.5",
+    "@prisma/client": "^7.1.0",
     "dotenv": "^17.2.3",
-    "express": "^5.0.6"
+    "express": "^5.0.6",
+    "prisma": "^7.1.0"
   },
   "workspaces": [
     "packages/*"

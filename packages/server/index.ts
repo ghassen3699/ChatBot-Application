@@ -1,39 +1,25 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import { InferenceClient } from "@huggingface/inference";
+import express from "express";
+import dotenv from "dotenv";
+import { conversationController } from "./controllers/conversation.controller";
 
 dotenv.config();
-const client = new InferenceClient(process.env.CHATBOT_HUGGINGFACE_READ_TOKEN);
-
 
 const app = express();
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.send(`Hello, World! ${process.env.MODEL_API_KEY}`);
 });
 
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello from the API!' });
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Hello from the API!" });
 });
 
 app.post("/api/chat", async (req, res) => {
   const { prompt } = req.body;
 
-  const chatCompletion = await client.chatCompletion({
-    model: "openai/gpt-oss-120b:fastest",
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    max_tokens: 100,
-    temperature: 0.7,
-    conversion_id: "unique-conversation-id",
-  });
-  const responseMessage = chatCompletion.choices[0]?.message?.content || "No response";
+  const responseMessage = await conversationController(prompt);
   res.json({ message: responseMessage });
 });
 
