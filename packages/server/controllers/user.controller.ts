@@ -1,12 +1,16 @@
 // CRUD operations for user management
-import type { Conversation } from "../models/Conversation";
-import { prisma } from "../prisma.client";
+import {
+  createUserService,
+  deleteUserService,
+  getUserByIdService,
+  updateUserService,
+} from "../services/user.service";
 
-export async function getUser(req, res) {
+export async function getUserController(req, res) {
   try {
     const userId = req.params.id;
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await getUserByIdService(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -18,17 +22,10 @@ export async function getUser(req, res) {
   }
 }
 
-export async function createUser(req, res) {
+export async function createUserController(req, res) {
   try {
     const { name, email } = req.body;
-    const newUser = await prisma.user.create({
-      data: {
-        name,
-        email,
-        createdAt: new Date(),
-        conversations: [] as Conversation[],
-      },
-    });
+    const newUser = await createUserService({ name, email });
     console.log("Created User:", newUser);
     res.status(201).json({ id: "new-id", name, email });
   } catch (error) {
@@ -37,14 +34,11 @@ export async function createUser(req, res) {
   }
 }
 
-export async function updateUser(req, res) {
+export async function updateUserController(req, res) {
   try {
     const userId = req.params.id;
     const { name, email } = req.body;
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { name, email },
-    });
+    const updatedUser = await updateUserService(userId, { name, email });
     console.log("Updated User:", updatedUser);
     res.json({ id: userId, name, email });
   } catch (error) {
@@ -53,11 +47,11 @@ export async function updateUser(req, res) {
   }
 }
 
-export async function deleteUser(req, res) {
+export async function deleteUserController(req, res) {
   try {
     const userId = req.params.id;
-    await prisma.user.delete({ where: { id: userId } });
-    res.status(204).send();
+    await deleteUserService(userId);
+    res.status(204).send("User deleted successfully");
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "Internal server error" });
